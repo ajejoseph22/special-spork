@@ -32,6 +32,7 @@ commands:
               exit 1
             fi
             
+
 jobs:
   build-frontend:
     docker:
@@ -43,8 +44,9 @@ jobs:
       - run:
           name: Build front-end
           command: |
-            # Your code here
-            exit 1
+            cd frontend
+            npm i
+            npm run build
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -59,8 +61,9 @@ jobs:
       - run:
           name: Back-end build
           command: |
-             # Your code here
-             exit 1
+            cd backend
+            npm i
+            npm run build
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
@@ -72,7 +75,7 @@ jobs:
       # Checkout code from git
       # Restore from cache
       # Your job code here
-                
+
   test-backend:
     docker:
       # Docker image here
@@ -80,7 +83,8 @@ jobs:
       # Checkout code from git
       # Restore from cache
       # Your job code here
-            
+
+
   scan-frontend:
     docker:
       # Docker image here
@@ -187,7 +191,8 @@ jobs:
           command: |
             # your code here
       # Here's where you will add some code to rollback on failure      
-                    
+
+
   deploy-backend:
     docker:
       # Docker image here that supports Ansible
