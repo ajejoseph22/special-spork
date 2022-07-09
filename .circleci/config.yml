@@ -38,6 +38,7 @@ jobs:
   test-frontend:
     docker:
       - image: cimg/node:13.8.0
+    parallelism: 3
     steps:
       - checkout
       - restore_cache:
