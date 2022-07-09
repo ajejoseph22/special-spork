@@ -48,7 +48,9 @@ jobs:
           command: |
             cd frontend
             npm i
-            npm test
+            npm test | circleci tests split --split-by=timings
+      - store_test_results:
+          path: test-results
       
 
 workflows:
