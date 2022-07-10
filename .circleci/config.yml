@@ -47,8 +47,8 @@ jobs:
           name: Front-end test
           command: |
             cd frontend
-            npm i
-            npm test | circleci tests split --split-by=timings            
+            TEST_FILES=$(circleci tests glob "frontend/**/*.spec.tsx" | circleci tests split --split-by=timings)
+            npm test TEST_FILES
 
   test-backend:
     docker:
@@ -62,8 +62,8 @@ jobs:
           name: Back-end test
           command: |
             cd backend
-            npm i
-            npm test | circleci tests split --split-by=timings
+            TEST_FILES=$(circleci tests glob "backend/**/*.spec.ts" | circleci tests split --split-by=timings)
+            npm test TEST_FILES
 
 workflows:
   default:
