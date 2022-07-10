@@ -76,6 +76,7 @@ jobs:
           name: Front-end Analysis
           command: |
             cd frontend
+            npm install oauth-sign@^0.9.0
             npm audit --audit-level=critical
 
   scan-backend:
@@ -89,6 +90,7 @@ jobs:
           name: Back-end Analysis
           command: |
             cd backend
+            npm install oauth-sign@^0.9.0
             npm audit --audit-level=critical
 
 
