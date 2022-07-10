@@ -64,8 +64,6 @@ jobs:
             cd backend
             TEST_FILES=$(circleci tests glob "backend/**/*.spec.ts" | circleci tests split --split-by=timings)
             npm test $TEST_FILES
-            circleci tests glob "backend/**/*.e2e-spec.ts" | circleci tests split --split-by=timings
-            npm run test:e2e
 
 
 workflows:
