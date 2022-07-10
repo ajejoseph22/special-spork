@@ -84,7 +84,7 @@ jobs:
       - restore_cache:
           keys: [backend-build]
       - command: |
-          cd frontend
+          cd backend
           npm audit --audit-level=critical
 
 
