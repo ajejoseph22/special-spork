@@ -15,6 +15,7 @@ Resources:
       CloudFrontOriginAccessIdentityConfig:
         Comment: Origin Access Identity for Serverless Static Website
 
+
   WebpageCDN:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -31,6 +32,20 @@ Resources:
             QueryString: False
           TargetOriginId: webpage
           ViewerProtocolPolicy: allow-all
+
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Sub "udapeople-${WorkflowID}"
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginAccessIdentity}'
+            Action: 's3:GetObject'
+            Resource: !Sub 'arn:aws:s3:::udapeople-${WorkflowID}/*'
 
 Outputs:
   WorkflowID:
