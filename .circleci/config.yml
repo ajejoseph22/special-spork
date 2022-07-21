@@ -96,6 +96,27 @@ jobs:
             npm audit --audit-level=critical
 
 
+
+  create-infrastructure:
+    docker:
+      - image: amazon/aws-cli:latest
+    steps:
+      - checkout
+      - run:
+          name: Create backend infrastructure
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7} \
+              --capabilities CAPABILITY_IAM
+      - run:
+          name: Create frontend infrastructure
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:7} \
+              --capabilities CAPABILITY_IAM
+
 workflows:
   default:
     jobs:
