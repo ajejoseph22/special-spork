@@ -141,8 +141,14 @@ workflows:
           requires:
             - build-backend
       - scan-backend:
-          requires: [build-backend]
+          requires:
+            - build-backend
       - scan-frontend:
-          requires: [build-frontend]
+          requires:
+            - build-frontend
       - create-infrastructure:
-          requires: [build-backend, build-frontend]
+          requires:
+            - test-backend
+            - test-frontend
+            - scan-backend
+            - scan-frontend
