@@ -131,6 +131,27 @@ jobs:
           paths:
             - inventory.txt
 
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - af:bc:39:aa:be:fa:c3:25:32:fb:f5:10:4e:75:28:d0
+      - restore_cache:
+          key: inventory
+          paths:
+            - inventory.txt
+      - run:
+          name: Install Ansible
+          command: |
+            apk add --update ansible
+      - run:
+          name: Configure Infrastructure
+          command: |
+            ansible-playbook -i inventory.txt main-remote.yml
+
 workflows:
   default:
     jobs:
@@ -154,3 +175,6 @@ workflows:
             - test-frontend
             - scan-backend
             - scan-frontend
+      - configure-infrastructure:
+          requires:
+            - create-infrastructure
