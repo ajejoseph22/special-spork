@@ -197,3 +197,6 @@ workflows:
       - configure-infrastructure:
           requires:
             - create-infrastructure
+      - run-migrations:
+          requires:
+            - configure-infrastructure
