@@ -127,7 +127,7 @@ jobs:
               --query "Reservations[*].Instances[*].PublicIpAddress" \
               --output text >> inventory.txt
       - save_cache:
-          key: inventory-${CIRCLE_WORKFLOW_ID:0:7}.txt
+          key: inventory-{{ checksum "inventory.txt" }}
           paths:
             - inventory.txt
 
@@ -140,7 +140,7 @@ jobs:
           fingerprints:
             - af:bc:39:aa:be:fa:c3:25:32:fb:f5:10:4e:75:28:d0
       - restore_cache:
-          key: inventory-${CIRCLE_WORKFLOW_ID:0:7}.txt
+          key: inventory-{{ checksum "inventory.txt" }}
           paths:
             - inventory.txt
       - run:
