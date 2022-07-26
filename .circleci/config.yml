@@ -161,6 +161,7 @@ jobs:
       - run:
           name: Run migrations
           command: |
+            cd backend
             npm run migrations > migrations_dump.txt
       - run:
           name: Send migration results to kvDB
@@ -170,6 +171,40 @@ jobs:
               DATA=$(cat migrations_dump.txt)
               curl https://kvdb.io/K3NbKJu4yxah8HWLYFPMiV/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d "$DATA"
             fi
+
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli:latest
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            sudo apt-get install curl
+            curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+            sudo apt-get install nodejs
+      - run:
+          name: Get backend url
+          command: |
+#           ideally fixed dns name in front of lb
+            export BACKEND_IP=$(aws ec2 describe-instances \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --query "Reservations[*].Instances[*].PublicIpAddress" \
+              --output text
+            )
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
+
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 
 workflows:
   default:
