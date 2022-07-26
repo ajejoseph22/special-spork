@@ -169,7 +169,7 @@ workflows:
 #      - scan-frontend:
 #          requires:
 #            - build-frontend
-      - create-infrastructure:
+      - create-infrastructure
 #          requires:
 #            - test-backend
 #            - test-frontend
