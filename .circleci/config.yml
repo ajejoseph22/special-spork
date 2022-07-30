@@ -138,8 +138,6 @@ jobs:
           root: /
           paths:
             - inventory.txt
-     - when:
-         on_
 
   configure-infrastructure:
     docker:
