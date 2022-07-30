@@ -132,7 +132,7 @@ jobs:
               --output text >> inventory.txt
       - run:
           name: Install tar
-          command |
+          command: |
             apk add tar
       - persist_to_workspace:
           root: /
