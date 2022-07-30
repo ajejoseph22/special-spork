@@ -131,13 +131,15 @@ jobs:
               --query "Reservations[*].Instances[*].PublicIpAddress" \
               --output text >> inventory.txt
       - run:
-          name: Install tar
+          name: Install tar and gzip
           command: |
-            yum install -y tar
+            yum install -y tar gzip
       - persist_to_workspace:
           root: /
           paths:
             - inventory.txt
+     - when:
+         on_
 
   configure-infrastructure:
     docker:
