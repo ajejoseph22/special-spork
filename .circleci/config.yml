@@ -158,7 +158,7 @@ jobs:
           fingerprints:
             - af:bc:39:aa:be:fa:c3:25:32:fb:f5:10:4e:75:28:d0
       - attach_workspace:
-          at: inventory.txt
+          at: ./
       - run:
           name: Install Ansible
           command: |
