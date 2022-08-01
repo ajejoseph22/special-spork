@@ -135,9 +135,19 @@ jobs:
           command: |
             yum install -y tar gzip
       - persist_to_workspace:
-          root: /
+          root: ./
           paths:
             - inventory.txt
+#      get last workflow id
+#      - run:
+#          name: Get last workflow id
+#          command: |
+#            curl -X GET -H "Content-Type: application/json" -H "Authorization: Bearer ${CIRCLE_TOKEN}" \
+#              https://circleci.com/api/v1.1/workflows/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}?circle-token=${CIRCLE_TOKEN} \
+#              | jq -r '.workflows[].id' \
+#              | sort -r \
+#              | xargs -I {} echo {} > last_workflow_id.txt
+#              | head -1 \
 
   configure-infrastructure:
     docker:
