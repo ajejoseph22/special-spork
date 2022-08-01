@@ -16,7 +16,7 @@ jobs:
             npm run build
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend-modules-{{ checksum "package.json" }}
+          key: frontend-modules-{{ checksum "frontend/package.json" }}
 
   build-backend:
     docker:
@@ -33,7 +33,7 @@ jobs:
             npm run build
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-modules-{{ checksum "package.json" }}
+          key: backend-modules-{{ checksum "backend/package.json" }}
 
   test-frontend:
     docker:
@@ -43,7 +43,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - frontend-modules-{{ checksum "package.json" }}
+            - frontend-modules-{{ checksum "frontend/package.json" }}
       - run:
           name: Front-end test
           command: |
@@ -59,7 +59,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - backend-modules-{{ checksum "package.json" }}
+            - backend-modules-{{ checksum "backend/package.json" }}
       - run:
           name: Back-end test
           command: |
@@ -74,7 +74,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - frontend-modules-{{ checksum "package.json" }}
+            - frontend-modules-{{ checksum "frontend/package.json" }}
       - run:
           name: Front-end scan
           command: |
@@ -90,7 +90,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - backend-modules-{{ checksum "package.json" }}
+            - backend-modules-{{ checksum "backend/package.json" }}
       - run:
           name: Back-end scan
           command: |
@@ -176,7 +176,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - backend-modules-{{ checksum "package.json" }}
+            - backend-modules-{{ checksum "backend/package.json" }}
       - run:
           name: Run migrations
           command: |
