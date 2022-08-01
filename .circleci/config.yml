@@ -35,6 +35,9 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-modules-{{ checksum "frontend/package.json" }}
+      - persist_to_workspace:
+          root: ./
+          paths: [frontend/dist]
 
   build-backend:
     docker:
@@ -242,14 +245,11 @@ jobs:
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
             cat frontend/.env
       - install-tar-gzip
-      - restore_cache:
-          keys:
-            - frontend-modules-{{ checksum "frontend/package.json" }}
+      - attach_workspace:
+          at: ./
       - run:
           name: Deploy frontend objects
           command: |
-            cd frontend
-            npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       - destroy-environment
