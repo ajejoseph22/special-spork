@@ -1,5 +1,16 @@
 version: 2.1
 
+commands:
+  destroy-environment:
+    description: Destroy CFN stack given a workflow ID.
+    steps:
+      - run:
+          name: Destroy stack
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
+
 jobs:
   build-frontend:
     docker:
@@ -101,6 +112,25 @@ jobs:
 
 
 
+  get-last-workflow-id:
+    docker:
+      - image: amazon/aws-cli:latest
+    steps:
+      - checkout
+      - run:
+          name: Install jq
+          command: |
+            sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+            sudo yum -y install jq
+      - run:
+          name: Get last workflow ID
+          command: |
+            aws cloudformation describe-stacks | jq '.Stacks[0].Parameters[0].ParameterValue' | tr -d '"' > last_workflow_id.txt
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - last_workflow_id.txt
+
   create-infrastructure:
     docker:
       - image: amazon/aws-cli:latest
@@ -138,16 +168,7 @@ jobs:
           root: ./
           paths:
             - inventory.txt
-#      get last workflow id
-#      - run:
-#          name: Get last workflow id
-#          command: |
-#            curl -X GET -H "Content-Type: application/json" -H "Authorization: Bearer ${CIRCLE_TOKEN}" \
-#              https://circleci.com/api/v1.1/workflows/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}?circle-token=${CIRCLE_TOKEN} \
-#              | jq -r '.workflows[].id' \
-#              | sort -r \
-#              | xargs -I {} echo {} > last_workflow_id.txt
-#              | head -1 \
+      - destroy-environment
 
   configure-infrastructure:
     docker:
@@ -167,6 +188,7 @@ jobs:
           name: Configure Infrastructure
           command: |
             ansible-playbook -i inventory.txt .circleci/ansible/configure-server.yml
+      - destroy-environment
 
 
   run-migrations:
@@ -190,6 +212,7 @@ jobs:
               DATA=$(cat backend/migrations_dump.txt)
               curl https://kvdb.io/K3NbKJu4yxah8HWLYFPMiV/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d "$DATA"
             fi
+      - destroy-environment
 
   deploy-frontend:
     docker:
@@ -223,6 +246,7 @@ jobs:
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - destroy-environment
 
 workflows:
   default:
