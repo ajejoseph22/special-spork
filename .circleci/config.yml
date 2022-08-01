@@ -286,5 +286,4 @@ workflows:
             - configure-infrastructure
       - deploy-frontend:
           requires:
-            - test-frontend
-            - scan-frontend
+            - create-infrastructure
