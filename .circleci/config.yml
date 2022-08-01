@@ -1,6 +1,13 @@
 version: 2.1
 
 commands:
+  install-tar-gzip:
+    description: Install tar-gzip.
+    steps:
+      - run:
+          name: Install tar-gzip
+          command: |
+            yum install -y tar gzip
   destroy-environment:
     description: Destroy CFN stack given a workflow ID.
     steps:
@@ -160,10 +167,7 @@ jobs:
               --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --query "Reservations[*].Instances[*].PublicIpAddress" \
               --output text >> inventory.txt
-      - run:
-          name: Install tar and gzip
-          command: |
-            yum install -y tar gzip
+      - install-tar-gzip
       - persist_to_workspace:
           root: ./
           paths:
