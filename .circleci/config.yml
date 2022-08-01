@@ -187,7 +187,7 @@ jobs:
           command: |
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
-              DATA=$(cat migrations_dump.txt)
+              DATA=$(cat backend/migrations_dump.txt)
               curl https://kvdb.io/K3NbKJu4yxah8HWLYFPMiV/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d "$DATA"
             fi
 
