@@ -1,0 +1,22 @@
+- name: create ~/app directory
+  file:
+    path: /app
+    state: directory
+
+- name: copy file onto server
+  - copy:
+    src: artifact.tar.gz
+    dest: "/app/artifact.tar.gz"
+
+- name: extract tar file
+  shell: tar -xvf /app/artifact.tar.gz
+
+- name: move extracted files to /app
+  shell: mv backend /app
+
+- name: (re)start app
+  shell: |
+    cd /app/backend
+    npm i
+    pm2 stop default
+    pm2 start npm -- start

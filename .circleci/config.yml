@@ -1,6 +1,13 @@
 version: 2.1
 
 commands:
+  install-ansible:
+    description: Install Ansible.
+    steps:
+      - run:
+          name: Install Ansible
+          command: |
+            apk add --update ansible
   install-tar-gzip:
     description: Install tar-gzip.
     steps:
@@ -135,7 +142,7 @@ jobs:
       - run:
           name: Get last workflow ID
           command: |
-            aws cloudformation describe-stacks | jq '.Stacks[0].Parameters[0].ParameterValue' | tr -d '"' > last_workflow_id.txt
+            aws cloudformation describe-stacks --max-items 1 | jq '.Stacks[0].Parameters[0].ParameterValue' | tr -d '"' > last_workflow_id.txt
       - install-tar-gzip
       - persist_to_workspace:
           root: ./
@@ -188,16 +195,12 @@ jobs:
             - af:bc:39:aa:be:fa:c3:25:32:fb:f5:10:4e:75:28:d0
       - attach_workspace:
           at: ./
-      - run:
-          name: Install Ansible
-          command: |
-            apk add --update ansible
+      - install-ansible
       - run:
           name: Configure Infrastructure
           command: |
             ansible-playbook -i inventory.txt .circleci/ansible/configure-server.yml
       - destroy-environment
-
 
   run-migrations:
     docker:
@@ -250,8 +253,24 @@ jobs:
       - run:
           name: Deploy frontend objects
           command: |
-            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz frontend/dist
+            cd frontend
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - destroy-environment
+  deploy-backend:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - install-tar-gzip
+      - install-ansible
+      - attach_workspace:
+          at: ./
+      - run:
+          name: Deploy to server
+          command: |
+            tar -czvf .circleci/ansible/files/artifact.tar.gz backend
+            ansible-playbook -i inventory.txt .circleci/ansible/deploy-backend.yml
       - destroy-environment
 
 workflows:
@@ -287,3 +306,6 @@ workflows:
       - deploy-frontend:
           requires:
             - create-infrastructure
+      - deploy-backend:
+          requires:
+            - configure-infrastructure
