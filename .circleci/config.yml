@@ -2,14 +2,14 @@ version: 2.1
 
 commands:
   install-ansible:
-    description: Install Ansible.
+    description: Install Ansible (on Alpine Linux)
     steps:
       - run:
           name: Install Ansible
           command: |
             apk add --update ansible
   install-tar-gzip:
-    description: Install tar-gzip.
+    description: Install tar-gzip (on Amazon Linux).
     steps:
       - run:
           name: Install tar-gzip
@@ -22,6 +22,9 @@ commands:
           name: Destroy stack
           when: on_fail
           command: |
+            aws --version || (curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
+              unzip awscli-bundle.zip && ./awscli-bundle/install -i ./awscli-bundle/install.sh && \ 
+              rm -rf awscli-bundle awscli-bundle.zip)
             aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
 
@@ -259,7 +262,7 @@ jobs:
       - destroy-environment
   deploy-backend:
     docker:
-      - image: amazon/aws-cli:latest
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - install-ansible
