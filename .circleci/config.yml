@@ -22,9 +22,7 @@ commands:
           name: Destroy stack
           when: on_fail
           command: |
-            aws --version || (curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
-              unzip awscli-bundle.zip && ./awscli-bundle/install -i ./awscli-bundle/install.sh && \ 
-              rm -rf awscli-bundle awscli-bundle.zip)
+            aws --version || (apk add --no-cache aws-cli)
             aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
 
