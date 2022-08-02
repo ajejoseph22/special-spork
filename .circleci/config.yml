@@ -259,10 +259,9 @@ jobs:
       - destroy-environment
   deploy-backend:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: amazon/aws-cli:latest
     steps:
       - checkout
-      - install-tar-gzip
       - install-ansible
       - attach_workspace:
           at: ./
