@@ -226,7 +226,6 @@ jobs:
               DATA=$(cat backend/migrations_dump.txt)
               curl https://kvdb.io/K3NbKJu4yxah8HWLYFPMiV/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d "$DATA"
             fi
-      - destroy-environment
 
   deploy-frontend:
     docker:
@@ -304,7 +303,8 @@ workflows:
             - create-infrastructure
       - run-migrations:
           requires:
-            - configure-infrastructure
+            - test-backend
+            - scan-backend
       - deploy-frontend:
           requires:
             - create-infrastructure
