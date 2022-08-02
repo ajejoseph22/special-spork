@@ -4,7 +4,7 @@
     state: directory
 
 - name: copy file onto server
-  - copy:
+  copy:
     src: artifact.tar.gz
     dest: "/app/artifact.tar.gz"
 
