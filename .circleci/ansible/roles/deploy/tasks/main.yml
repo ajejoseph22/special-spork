@@ -1,34 +1,23 @@
 ---
 - name: create ~/app directory
-  become_user: root
-  become_method: sudo
   file:
     path: /app
     state: directory
 
 - name: copy file onto server
-  become_user: root
-  become_method: sudo
   copy:
     src: artifact.tar.gz
     dest: "/app/artifact.tar.gz"
 
 - name: extract tar file
-  become_user: root
-  become_method: sudo
   shell: tar -xvf /app/artifact.tar.gz
 
 - name: move extracted files to /app
-  become_user: root
-  become_method: sudo
   shell: mv backend /app
 
 - name: (re)start app
-  become_user: root
-  become_method: sudo
   shell: |
     cd /app/backend
     npm i
     pm2 stop default
     pm2 start npm -- start
-    
