@@ -26,6 +26,8 @@ commands:
               curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
               unzip awscli-bundle.zip && ./awscli-bundle/install -b /usr/local/bin/aws && \
             rm -rf awscli-bundle* && rm -rf awscli-bundle.zip)
+            
+            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive || echo
             aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
 
