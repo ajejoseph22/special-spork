@@ -19,5 +19,6 @@
   shell: |
     cd /app/backend
     npm i
-    pm2 stop default
+    pm2 stop default || echo "No pm2 process to stop"
     pm2 start npm -- start
+    
