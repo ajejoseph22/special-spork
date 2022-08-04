@@ -250,11 +250,15 @@ jobs:
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
             cat frontend/.env
       - install-tar-gzip
+      - restore_cache:
+          keys:
+            - frontend-modules-{{ checksum "frontend/package.json" }}
       - run:
           name: Deploy frontend objects
           command: |
             cd frontend
             # needed to add new .env variables into the prod build
+            npm i
             npm run build 
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
