@@ -281,37 +281,37 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-          requires:
-            - build-frontend
-      - test-backend:
-          requires:
-            - build-backend
-      - scan-backend:
-          requires:
-            - build-backend
-      - scan-frontend:
-          requires:
-            - build-frontend
-      - get-last-workflow-id
-      - create-infrastructure:
-          requires:
-            - test-backend
-            - test-frontend
-            - scan-backend
-            - scan-frontend
+#      - build-frontend
+#      - build-backend
+#      - test-frontend:
+#          requires:
+#            - build-frontend
+#      - test-backend:
+#          requires:
+#            - build-backend
+#      - scan-backend:
+#          requires:
+#            - build-backend
+#      - scan-frontend:
+#          requires:
+#            - build-frontend
+#      - get-last-workflow-id
+      - create-infrastructure
+#          requires:
+#            - test-backend
+#            - test-frontend
+#            - scan-backend
+#            - scan-frontend
       - configure-infrastructure:
           requires:
             - create-infrastructure
-      - run-migrations:
-          requires:
-            - test-backend
-            - scan-backend
-      - deploy-frontend:
-          requires:
-            - create-infrastructure
+      - run-migrations
+#          requires:
+#            - test-backend
+#            - scan-backend
+#      - deploy-frontend:
+#          requires:
+#            - create-infrastructure
       - deploy-backend:
           requires:
             - configure-infrastructure
