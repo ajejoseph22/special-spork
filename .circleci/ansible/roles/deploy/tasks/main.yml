@@ -18,7 +18,7 @@
 - name: (re)start app
   shell: |
     cd /app/backend
-    npm i --production
+    npm i
     pm2 stop default || echo "No pm2 process to stop"
     pm2 start npm -- start
   environment:
