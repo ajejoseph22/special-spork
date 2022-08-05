@@ -31,10 +31,10 @@ commands:
             aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
   revert-migrations:
-    description: revert migrations
+    description: Revert migrations
     steps:
       - run:
-          name: revert migrations
+          name: Revert migrations
           when: on_fail
           command: |
             npm run migrations:revert
