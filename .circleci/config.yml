@@ -30,6 +30,14 @@ commands:
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive || echo
             aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
+  revert-migrations:
+    description: revert migrations
+    steps:
+      - run:
+          name: revert migrations
+          when: on_fail
+          command: |
+            npm run migrations:revert
 
 jobs:
   build-frontend:
@@ -277,6 +285,7 @@ jobs:
             tar -czvf .circleci/ansible/roles/deploy/files/artifact.tar.gz backend
             ansible-playbook -i inventory.txt .circleci/ansible/deploy-backend.yml
       - destroy-environment
+      - revert-migrations
 
 workflows:
   default:

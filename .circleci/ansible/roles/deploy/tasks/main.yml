@@ -14,15 +14,21 @@
 
 - name: move extracted files to /app
   shell: mv backend /app
+  register: TYPEORM_PORT
 
 - name: (re)start app
   shell: |
     echo "TYPEORM_PORT = ${TYPEORM_PORT}"
     echo "TYPEORM_ENTITIES = ${TYPEORM_ENTITIES}"
     cd /app/backend
-    npm i
+    npm i -s
     pm2 stop default || echo "No pm2 process to stop"
     pm2 start npm -- start
+  register: TYPEORM_ENTITIES
+
+- name: print message
+  debug:
+    msg: "{{ TYPEORM_ENTITIES.stdout_lines }}"
 #  environment:
 #    ENVIRONMENT: production
 #    TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION')}}"
