@@ -346,6 +346,22 @@ jobs:
       - destroy-environment
       - revert-migrations
 
+  cloudfront-update:
+    docker:
+      - image: amazon/aws-cli:latest
+    steps:
+      - checkout
+      - run:
+          name: Update cloudfront distribution with new FE (bucket)
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/cloudfront.yml \
+              --stack-name CDNStack \
+              --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --tags project=udapeople
+      - destroy-environment
+      - revert-migrations
+
 workflows:
   default:
     jobs:
