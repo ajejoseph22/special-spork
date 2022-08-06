@@ -165,6 +165,7 @@ jobs:
           name: Get last workflow ID
           command: |
             aws cloudformation describe-stacks --max-items 1 | jq '.Stacks[0].Parameters[0].ParameterValue' | tr -d '"' > last_workflow_id.txt
+            cat last_workflow_id.txt
       - install-tar-gzip
       - persist_to_workspace:
           root: ./
