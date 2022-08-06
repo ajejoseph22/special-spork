@@ -15,17 +15,6 @@ commands:
           name: Install tar-gzip
           command: |
             yum install -y tar gzip
-  get-backend-url:
-    description: Get backend url.
-    steps:
-      - run:
-          name: Get backend url
-          command: |
-            export BACKEND_IP=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-            --query "Reservations[*].Instances[*].PublicIpAddress" \
-            --output text
-            )
   destroy-environment:
     description: Destroy CFN stack given a workflow ID.
     steps:
@@ -256,10 +245,14 @@ jobs:
           command: |
             curl --silent --location https://rpm.nodesource.com/setup_16.x | bash -
             yum -y install nodejs
-      - get-backend-url
       - run:
           name: Add backend url to frontend config
           command: |
+            export BACKEND_IP=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --query "Reservations[*].Instances[*].PublicIpAddress" \
+            --output text
+            )
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
@@ -305,10 +298,14 @@ jobs:
               curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
               unzip awscli-bundle.zip && ./awscli-bundle/install -b /usr/local/bin/aws && \
               rm -rf awscli-bundle* && rm -rf awscli-bundle.zip)
-      - get-backend-url
       - run:
           name: Backend smoke test.
           command: |
+            export BACKEND_IP=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --query "Reservations[*].Instances[*].PublicIpAddress" \
+            --output text
+            )
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
