@@ -8,12 +8,12 @@ Parameters:
 
 
 Resources:
-  
-  CloudFrontOriginAccessIdentity:
-    Type: "AWS::CloudFront::CloudFrontOriginAccessIdentity"
-    Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: Origin Access Identity for Serverless Static Website
+#  Needed for when we take the bucket private
+#  CloudFrontOriginAccessIdentity:
+#    Type: "AWS::CloudFront::CloudFrontOriginAccessIdentity"
+#    Properties:
+#      CloudFrontOriginAccessIdentityConfig:
+#        Comment: Origin Access Identity for Serverless Static Website
 
 
   WebpageCDN:
@@ -23,8 +23,9 @@ Resources:
         Origins:
           - DomainName: !Sub "udapeople-${WorkflowID}.s3.amazonaws.com"
             Id: webpage
-            S3OriginConfig:
-              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"
+#  Needed for when we take the bucket private
+#            S3OriginConfig:
+#              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"
         Enabled: True
         DefaultRootObject: index.html
         DefaultCacheBehavior:
@@ -33,19 +34,19 @@ Resources:
           TargetOriginId: webpage
           ViewerProtocolPolicy: allow-all
 
-
-  BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Sub "udapeople-${WorkflowID}"
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              AWS: !Sub 'arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginAccessIdentity}'
-            Action: 's3:GetObject'
-            Resource: !Sub 'arn:aws:s3:::udapeople-${WorkflowID}/*'
+#  Needed for when we take the bucket private
+#  BucketPolicy:
+#    Type: AWS::S3::BucketPolicy
+#    Properties:
+#      Bucket: !Sub "udapeople-${WorkflowID}"
+#      PolicyDocument:
+#        Version: '2012-10-17'
+#        Statement:
+#          - Effect: Allow
+#            Principal:
+#              AWS: !Sub 'arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginAccessIdentity}'
+#            Action: 's3:GetObject'
+#            Resource: !Sub 'arn:aws:s3:::udapeople-${WorkflowID}/*'
 
 Outputs:
   WorkflowID:
