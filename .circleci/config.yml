@@ -33,10 +33,21 @@ commands:
   revert-migrations:
     description: Revert migrations
     steps:
+      - restore_cache:
+          keys:
+            - backend-modules-{{ checksum "backend/package.json" }}
       - run:
           name: Revert migrations
           when: on_fail
           command: |
+            SUCCESS=$(curl --insecure  https://kvdb.io/K3NbKJu4yxah8HWLYFPMiV/migration_<< parameters.workflow_id >>)
+            
+            if (( $SUCCESS == 1 ));
+            then
+              cd ~/project/backend
+              npm run migration:revert
+            fi
+            
             npm run migrations:revert
 
 jobs:
@@ -195,6 +206,7 @@ jobs:
           paths:
             - inventory.txt
       - destroy-environment
+      - revert-migrations
 
   configure-infrastructure:
     docker:
@@ -212,6 +224,7 @@ jobs:
           command: |
             ansible-playbook -i inventory.txt .circleci/ansible/configure-server.yml
       - destroy-environment
+      - revert-migrations
 
   run-migrations:
     docker:
@@ -234,6 +247,8 @@ jobs:
               DATA=$(cat backend/migrations_dump.txt)
               curl https://kvdb.io/K3NbKJu4yxah8HWLYFPMiV/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d "$DATA"
             fi
+      - destroy-environment
+      - revert-migrations
 
   deploy-frontend:
     docker:
@@ -271,6 +286,8 @@ jobs:
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       - destroy-environment
+      - revert-migrations
+
   deploy-backend:
     docker:
       - image: python:3.7-alpine3.11
@@ -286,6 +303,7 @@ jobs:
             ansible-playbook -i inventory.txt .circleci/ansible/deploy-backend.yml
       - destroy-environment
       - revert-migrations
+
   smoke-test:
     docker:
       - image: python:3.7-alpine3.11
@@ -326,6 +344,7 @@ jobs:
               return 1
             fi
       - destroy-environment
+      - revert-migrations
 
 workflows:
   default:
