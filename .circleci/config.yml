@@ -224,7 +224,7 @@ jobs:
       - run:
           name: Configure Infrastructure
           command: |
-            find /tmp
+            ls
             ansible-playbook -i inventory.txt .circleci/ansible/configure-server.yml
       - destroy-environment
       - revert-migrations
