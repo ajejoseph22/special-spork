@@ -166,7 +166,7 @@ jobs:
             aws cloudformation \
               list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               --no-paginate --output text > /tmp/last_workflow_id.txt
-            cat last_workflow_id.txt
+            cat /tmp/last_workflow_id.txt
       - install-tar-gzip
       - persist_to_workspace:
           root: /tmp
@@ -224,7 +224,7 @@ jobs:
       - run:
           name: Configure Infrastructure
           command: |
-            find .
+            find /
             ansible-playbook -i inventory.txt .circleci/ansible/configure-server.yml
       - destroy-environment
       - revert-migrations
@@ -375,7 +375,7 @@ jobs:
       - run:
           name: Cleanup
           command: |
-            find .
+            find /
             OLD_ID=$(cat ~/project/last_workflow_id.txt | head -1)
             
             aws s3 rm s3://udapeople-${OLD_ID} --recursive || echo
