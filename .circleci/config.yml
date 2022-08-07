@@ -148,6 +148,31 @@ jobs:
             npm audit fix --force
             npm audit --audit-level=critical
 
+
+
+  get-last-workflow-id:
+    docker:
+      - image: amazon/aws-cli:latest
+    steps:
+      - checkout
+      - run:
+          name: Install jq
+          command: |
+            yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+            yum -y install jq
+      - run:
+          name: Get last workflow ID
+          command: |
+            aws cloudformation \
+              list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+              --no-paginate --output text > last_workflow_id.txt
+            cat last_workflow_id.txt
+      - install-tar-gzip
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - last_workflow_id.txt
+
   create-infrastructure:
     docker:
       - image: amazon/aws-cli:latest
@@ -199,6 +224,7 @@ jobs:
       - run:
           name: Configure Infrastructure
           command: |
+            find .
             ansible-playbook -i inventory.txt .circleci/ansible/configure-server.yml
       - destroy-environment
       - revert-migrations
@@ -343,18 +369,15 @@ jobs:
       - image: amazon/aws-cli:latest
     steps:
       - checkout
+      - install-tar-gzip
+      - attach_workspace:
+          at: ./
       - run:
-          name: Install jq
+          name: Cleanup
           command: |
-            yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-            yum -y install jq
-      - run:
-          name: Get last workflow ID
-          command: |
-            export OLD_ID=$(aws cloudformation describe-stacks --max-items 1 | jq '.Stacks[0].Parameters[0].ParameterValue' | tr -d '"')
-      - run:
-          name: Cleanup old stack
-          command: |
+            find .
+            OLD_ID=$(cat ~/project/last_workflow_id.txt | head -1)
+            
             aws s3 rm s3://udapeople-${OLD_ID} --recursive || echo
             aws cloudformation delete-stack --stack-name frontend-${OLD_ID}
             aws cloudformation delete-stack --stack-name backend-${OLD_ID}
@@ -376,6 +399,7 @@ workflows:
       - scan-frontend:
           requires:
             - build-frontend
+      - get-last-workflow-id
       - create-infrastructure:
           requires:
             - test-backend
