@@ -366,6 +366,7 @@ jobs:
       - image: amazon/aws-cli:latest
     steps:
       - checkout
+      - install-tar-gzip
       - attach_workspace:
           at: ./
       - run:
