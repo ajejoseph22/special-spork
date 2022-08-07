@@ -387,7 +387,6 @@ workflows:
       - scan-frontend:
           requires:
             - build-frontend
-      - get-last-workflow-id
       - create-infrastructure:
           requires:
             - test-backend
