@@ -1,5 +1,11 @@
 version: 2.1
 
+only_prod: &only_prod
+  filters:
+    branches:
+      only:
+        - master
+
 commands:
   install-ansible:
     description: Install Ansible (on Alpine Linux)
@@ -212,7 +218,6 @@ jobs:
       - run:
           name: Configure Infrastructure
           command: |
-            ls
             ansible-playbook -i inventory.txt .circleci/ansible/configure-server.yml
       - destroy-environment
       - revert-migrations
@@ -363,7 +368,6 @@ jobs:
       - run:
           name: Cleanup
           command: |
-            find /tmp
             OLD_ID=$(cat ~/project/last_workflow_id.txt | head -1)
             
             aws s3 rm s3://udapeople-${OLD_ID} --recursive || echo
@@ -388,31 +392,39 @@ workflows:
           requires:
             - build-frontend
       - create-infrastructure:
+          <<: *only_prod
           requires:
             - test-backend
             - test-frontend
             - scan-backend
             - scan-frontend
       - configure-infrastructure:
+          <<: *only_prod
           requires:
             - create-infrastructure
       - run-migrations:
+          <<: *only_prod
           requires:
             - test-backend
             - scan-backend
       - deploy-frontend:
+          <<: *only_prod
           requires:
             - create-infrastructure
       - deploy-backend:
+          <<: *only_prod
           requires:
             - configure-infrastructure
       - smoke-test:
+          <<: *only_prod
           requires:
             - deploy-backend
             - deploy-frontend
       - cloudfront-update:
+          <<: *only_prod
           requires:
             - smoke-test
       - cleanup:
+          <<: *only_prod
           requires:
             - cloudfront-update
