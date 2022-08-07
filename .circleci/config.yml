@@ -45,10 +45,9 @@ commands:
             if (( $SUCCESS == 1 ));
             then
               cd ~/project/backend
-              npm run migration:revert
+              node -v || (apk add --update nodejs || yum install -y nodejs)
+              npm run migrations:revert
             fi
-            
-            npm run migrations:revert
 
 jobs:
   build-frontend:
@@ -257,11 +256,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install dependencies (nodejs, npm)
-          command: |
-            curl --silent --location https://rpm.nodesource.com/setup_16.x | bash -
-            yum -y install nodejs
-      - run:
           name: Add backend url to frontend config
           command: |
             export BACKEND_IP=$(aws ec2 describe-instances \
@@ -277,6 +271,11 @@ jobs:
       - restore_cache:
           keys:
             - frontend-modules-{{ checksum "frontend/package.json" }}
+      - run:
+          name: Install dependencies (nodejs, npm)
+          command: |
+            curl --silent --location https://rpm.nodesource.com/setup_16.x | bash -
+            yum -y install nodejs
       - run:
           name: Deploy frontend objects
           command: |
@@ -362,6 +361,23 @@ jobs:
               --tags project=udapeople
       - destroy-environment
       - revert-migrations
+  cleanup:
+    docker:
+      - image: amazon/aws-cli:latest
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./
+      - run:
+          name: Cleanup
+          command: |
+            IN=$(cat last_workflow_id.txt | head -1)
+            arrIN=(${IN//-/ })
+            OLD_ID=${arrIN[1]}
+            
+            aws s3 rm s3://udapeople-${OLD_ID} --recursive || echo
+            aws cloudformation delete-stack --stack-name frontend-${OLD_ID}
+            aws cloudformation delete-stack --stack-name backend-${OLD_ID}
 
 workflows:
   default:
@@ -407,3 +423,6 @@ workflows:
       - cloudfront-update:
           requires:
             - smoke-test
+      - cleanup:
+          requires:
+            - cloudfront-update
