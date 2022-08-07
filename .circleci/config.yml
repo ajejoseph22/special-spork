@@ -224,7 +224,7 @@ jobs:
       - run:
           name: Configure Infrastructure
           command: |
-            find /
+            find /tmp
             ansible-playbook -i inventory.txt .circleci/ansible/configure-server.yml
       - destroy-environment
       - revert-migrations
@@ -375,7 +375,7 @@ jobs:
       - run:
           name: Cleanup
           command: |
-            find /
+            find /tmp
             OLD_ID=$(cat ~/project/last_workflow_id.txt | head -1)
             
             aws s3 rm s3://udapeople-${OLD_ID} --recursive || echo
