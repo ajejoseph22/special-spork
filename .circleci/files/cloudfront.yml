@@ -23,8 +23,9 @@ Resources:
         Origins:
           - DomainName: !Sub "udapeople-${WorkflowID}.s3.amazonaws.com"
             Id: webpage
-#  Needed for when we take the bucket private
-#            S3OriginConfig:
+            S3OriginConfig:
+              OriginAccessIdentity:
+#              Needed for when we take the bucket private
 #              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"
         Enabled: True
         DefaultRootObject: index.html
