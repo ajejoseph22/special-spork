@@ -148,9 +148,7 @@ jobs:
             npm audit fix --force
             npm audit --audit-level=critical
 
-
-
-  get-last-workflow-id:
+  create-infrastructure:
     docker:
       - image: amazon/aws-cli:latest
     steps:
@@ -167,17 +165,6 @@ jobs:
               list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               --no-paginate --output text > /tmp/last_workflow_id.txt
             cat /tmp/last_workflow_id.txt
-      - install-tar-gzip
-      - persist_to_workspace:
-          root: /tmp
-          paths:
-            - last_workflow_id.txt
-
-  create-infrastructure:
-    docker:
-      - image: amazon/aws-cli:latest
-    steps:
-      - checkout
       - run:
           name: Create backend infrastructure
           command: |
@@ -207,6 +194,7 @@ jobs:
           root: /tmp
           paths:
             - inventory.txt
+            - last_workflow_id.txt
       - destroy-environment
       - revert-migrations
 
