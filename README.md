@@ -4,7 +4,7 @@ In this project, I proved my mastery of the following objectives:
 
 - The fundamentals and benefits of CI/CD to achieve, build, and deploy automation for cloud-based software products.
 - Utilizing deployment strategies to design and build CI/CD pipelines that support Continuous Delivery processes.
-- Utilize a configuration management tool to accomplish deployment to cloud-based servers.
+- Utilizing configuration management tools to accomplish deployment to cloud-based servers.
 - Surfacing critical server errors for diagnosis using centralized structured logging.
 
 ### built with
